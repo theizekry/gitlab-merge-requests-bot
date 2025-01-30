@@ -15,7 +15,7 @@ It supports:
 ### **1️⃣ Install the Script**
 Run the following command to **install the script system-wide**:
 ```bash
-sudo curl -sSLo /usr/local/bin/new_gitlab_pr https://raw.githubusercontent.com/theizekry/gitlab-merge-requests-bot/refs/heads/main/new_gitlab_pr.sh && sudo chmod +x /usr/local/bin/new_gitlab_pr
+sudo curl -sSLo /usr/local/bin/new_gitlab_pr https://raw.githubusercontent.com/theizekry/gitlab-merge-requests-bot/refs/heads/main/gitlab_pr.sh && sudo chmod +x /usr/local/bin/new_gitlab_pr
 ```
 ✅ This:
 - Downloads the script as `new_gitlab_pr`
@@ -35,7 +35,7 @@ new_gitlab_pr --help
 ### **3️⃣ (Optional) Update the Script**
 To get the **latest version**, run:
 ```bash
-sudo curl -sSLo /usr/local/bin/new_gitlab_pr https://raw.githubusercontent.com/theizekry/gitlab-merge-requests-bot/refs/heads/main/new_gitlab_pr.sh && sudo chmod +x /usr/local/bin/new_gitlab_pr
+sudo curl -sSLo /usr/local/bin/new_gitlab_pr https://raw.githubusercontent.com/theizekry/gitlab-merge-requests-bot/refs/heads/main/gitlab_pr.sh && sudo chmod +x /usr/local/bin/new_gitlab_pr
 ```
 *(Same as the install command, just overwrites the old version.)*
 
