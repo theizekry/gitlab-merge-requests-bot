@@ -11,7 +11,7 @@
 GITLAB_URL="https://gitlab.com/api/v4"            
 
 SOURCE_BRANCH=$(git branch --show-current)
-DEFAULT_TARGET_BRANCHES=("main" "uat" "beta")
+DEFAULT_TARGET_BRANCHES=("master" "develop" "uat")
 PULL_REQUEST_DESCRIPTION=$(git log -1 --pretty=%B)
 LOG_FILE="$HOME/gitlab_pr.log"
 
@@ -51,10 +51,8 @@ show_help() {
   echo
   echo "Prerequisites:"
   echo -e "${YELLOW} - A valid GitLab Personal Access Token with API access${NC} For more details about access token visit https://shorturl.at/QEbyn."
-  echo -e "${YELLOW} - Your GitLab project ID ${NC} -> In new GitLab version you must click settings in right side Project page to get & copy Project ID"
   echo "  - Set the environment variables before running the script:"
-  echo "      export GITLAB_TOKEN='your_token_here'"
-  echo -e "      export GITLAB_PROJECT_ID='your_project_id_here' ${NC}"
+  echo "    export GITLAB_TOKEN='your_token_here'"
   echo
   echo "Arguments:"
   echo "  TARGET_BRANCHES    (Optional) List of target branches for the Merge Request."
@@ -82,6 +80,30 @@ if [[ "$1" == "-h" || "$1" == "--help" ]]; then
   show_help
 fi
 
+# Function to get the GitLab Project ID dynamically
+fetch_project_id() {
+  local repo_url
+  repo_url=$(git config --get remote.origin.url | sed 's/\.git$//')  # Get the repo URL
+  repo_url="${repo_url/git@github.com:/https://github.com/}"  # Convert SSH to HTTPS format
+  repo_url="${repo_url/git@gitlab.com:/https://gitlab.com/}"  # Convert SSH to HTTPS
+
+  echo "🔍 Fetching Project ID for repository: $repo_url"
+
+  local response
+  response=$(curl --silent --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$GITLAB_URL/projects?search=$(basename "$repo_url")")
+
+  PROJECT_ID=$(echo "$response" | grep -o '"id":[0-9]*' | head -1 | cut -d ':' -f2)
+
+  if [[ -z "$PROJECT_ID" ]]; then
+    echo "❌ Error: Could not fetch PROJECT_ID from GitLab. Ensure the repository exists and your token has API access."
+    exit 1
+  fi
+
+  echo "✅ Project ID: $PROJECT_ID"
+  # Set PROJECT ID
+  GITLAB_PROJECT_ID=$PROJECT_ID
+}
+
 # Function to verify GitLab Token
 verify_gitlab_token() {
   local response
@@ -104,6 +126,8 @@ verify_project_id() {
   fi
 }
 
+fetch_project_id
+
 # Verify Token and Project ID if empty
 if [[ -z "$GITLAB_TOKEN" ]]; then
   error "GitLab token is missing! Set it before running the script."
@@ -119,8 +143,17 @@ verify_project_id
 
 # Check if the user provided target branches, otherwise use default ones
 TARGET_BRANCHES=("$@")
+
 if [[ ${#TARGET_BRANCHES[@]} -eq 0 ]]; then
-  TARGET_BRANCHES=("${DEFAULT_TARGET_BRANCHES[@]}")
+  echo -e "\n${YELLOW}⚠️ No target branches specified. The default target branches will be used${NC}${GREEN}: ${DEFAULT_TARGET_BRANCHES[*]}${NC}"
+  read -p "Do you want to proceed? (y/n): " confirm
+
+  if [[ "$confirm" =~ ^[Yy]$ ]]; then
+    TARGET_BRANCHES=("${DEFAULT_TARGET_BRANCHES[@]}")
+    echo -e "${GREEN}✅ Proceeding with default branches: ${TARGET_BRANCHES[*]}${NC}\n"
+  else
+    error "Operation canceled by the user."
+  fi
 fi
 
 # Check if branch exists
@@ -142,7 +175,7 @@ check_branch_exists() {
   fi
 }
  
-# Prevent creating an MergeReqests if the source branch is in the target branches
+# Prevent creating an Merge Requests if the source branch is in the target branches
 for TARGET_BRANCH in "${TARGET_BRANCHES[@]}"; do
   if [[ "$SOURCE_BRANCH" == "$TARGET_BRANCH" ]]; then
     error "-> Error: Source branch '$SOURCE_BRANCH' is one of the target branches ('$TARGET_BRANCH'). You cannot create a Merge Request from '$SOURCE_BRANCH' to itself."
