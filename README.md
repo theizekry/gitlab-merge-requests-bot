@@ -8,7 +8,8 @@ It supports:
 - **Error handling and logging**
 
 ## 🎬 Demo Video
-📹 **Watch the script in action**: [Video Link](#) *(Replace with actual link)*
+
+https://github.com/user-attachments/assets/c6cc8e88-6d73-4418-bc41-c3f9dc8b556d
 
 ---
 
