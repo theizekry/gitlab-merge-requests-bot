@@ -1,6 +1,6 @@
 
 
-# ✨ Automate Your GitLab Merge Requests with One Command! ✨
+### ✨ Automate Your GitLab Merge Requests with One Command! ✨
 
   
 
