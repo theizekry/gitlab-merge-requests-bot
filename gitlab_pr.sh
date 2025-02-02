@@ -7,15 +7,8 @@
 # Release Date: 01-2025
 # ----------------------------------------------------------------
 
-# Configuration
-GITLAB_URL="https://gitlab.com/api/v4"            
 
-SOURCE_BRANCH=$(git branch --show-current)
-DEFAULT_TARGET_BRANCHES=("master" "develop" "uat")
-PULL_REQUEST_DESCRIPTION=$(git log -1 --pretty=%B)
-LOG_FILE="$HOME/gitlab_pr.log"
-
-# Colors for outputs.
+# Some Colors for outputs.
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
@@ -26,7 +19,7 @@ error() {
   local exit_on_error=${2:-true}  # Default: true (exit)
   echo
   echo -e "${RED}❗️ Error: $1${NC}"
-  echo "$(date) - $1" >> "$LOG_FILE"
+  echo "$(date) - $1" >> "$HOME/gitlab_pr.log"
   
   if [[ "$exit_on_error" == "true" ]]; then
     exit 1
@@ -34,14 +27,27 @@ error() {
 }
 
 success() {
+  local exit_after_echo=${2:-false}  # Default: false (continue)
   echo
   echo -e "${GREEN}$1${NC}"
+
+  if [[ "$exit_after_echo" == "true" ]]; then
+    exit 1
+  fi
 }
 
 warning() {
   echo
   echo -e "${YELLOW}$1${NC}"
 }
+
+# Check if DEFAULT_TARGET_BRANCHES is set in the environment
+if [[ -n "$DEFAULT_TARGET_BRANCHES" ]]; then
+  IFS=' ' read -r -a DEFAULT_TARGET_BRANCHES <<< "$DEFAULT_TARGET_BRANCHES"
+else
+  DEFAULT_TARGET_BRANCHES=("master" "develop" "uat")
+fi
+
 
 # Function to display help message
 show_help() {
@@ -50,7 +56,7 @@ show_help() {
   echo -e "${GREEN}Creates GitLab Merge Requests from the current branch to specified target branches.${NC}"
   echo
   echo "Prerequisites:"
-  echo -e "${YELLOW} - A valid GitLab Personal Access Token with API access${NC} For more details about access token visit https://shorturl.at/QEbyn."
+  echo -e "${YELLOW} - A valid GitLab Personal Access Token with API & Write access${NC} For more details about access token visit https://shorturl.at/QEbyn."
   echo "  - Set the environment variables before running the script:"
   echo "    export GITLAB_TOKEN='your_token_here'"
   echo
@@ -69,7 +75,7 @@ show_help() {
   echo "  Author: Islam Zekry"
   echo "  GitHub: https://github.com/theizekry"
   echo "  Description: This script automates the creation of Merge Requests on GitLab for one or more targets branches by simple one hit."
-  echo "  Version: 1.0."
+  echo "  Version: 1.0.0"
   echo "  Release Date: 01-2025"
   echo
   exit 0
@@ -79,6 +85,29 @@ show_help() {
 if [[ "$1" == "-h" || "$1" == "--help" ]]; then
   show_help
 fi
+
+# Check Current version
+if [[ "$1" == "-v" || "$1" == "--version" ]]; then
+  success "GitPR Version 1.0.0" true
+fi
+
+# Check if the current directory is a Git repository
+if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+  error "This script must be run inside a Git repository."
+fi
+
+# Get repository origin URL
+REPO_URL=$(git config --get remote.origin.url)
+
+# Ensure repository is a GitLab repository
+if [[ ! "$REPO_URL" =~ gitlab.com ]]; then
+  error "This script only supports GitLab repositories. Detected repository: $REPO_URL"
+fi
+
+# Configuration
+GITLAB_URL="https://gitlab.com/api/v4"            
+SOURCE_BRANCH=$(git branch --show-current)
+PULL_REQUEST_DESCRIPTION=$(git log -1 --pretty=%B)
 
 # Function to get the GitLab Project ID dynamically
 fetch_project_id() {
