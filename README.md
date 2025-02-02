@@ -17,12 +17,19 @@ A **lightweight yet powerful Bash script** that streamlines your merge request w
 ### 🔥 Why You Need This
 
 ✅ **One Command to Rule Them All** – No more manual MRs. Automate it with a single script.  
+
 ✅ **Handles Multiple Branches** – Easily create MRs for multiple target branches without hassle. 
+
 ✅ **Reduces Repetitive Tasks** – Automate filling in details with take your last commit as PR description.  
+
 ✅ **Boosts Productivity** – Spend less time managing MRs and more time coding.
+
 ✅ **Duplicate PR Prevention:** – Checks for existing PRs before creating a new one.
+
 ✅ **System-Wide Installation:** – Easily install and run from anywhere.
+
 ✅ **Error Handling & Logging:** – Stay informed with detailed logs.
+
 ✅ **Custom Target Branches** – Specify branches manually for future use or set different target branches each time, even exporting your daily ones for flexible PR creation.
 
 ## 🛠️ How to Get Started
