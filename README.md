@@ -1,35 +1,29 @@
 
+
 # ✨ Automate Your GitLab Merge Requests with One Command! ✨
 
   
 
 ## 🚀 Introducing the GitLab Merge Requests Bot
 
-Managing multiple merge requests can be time-consuming, especially when working with multiple branches. **What if you could create and manage GitLab Merge Requests with a single command?**
+Tired of manually creating and managing GitLab Merge Requests? We’ve all been there—switching between branches, opening the browser, filling out merge request details, and repeating the process over and over. What if you could automate it all with a single command?
 
   
-Meet **GitLab Merge Requests Bot**, a simple yet powerful Bash script that streamlines your PR workflow, making it easier to handle multiple branches and avoid waste of time and repeated tasks even if it simple.
+## ✨ Meet the GitLab Merge Requests Bot!
+
+A **lightweight yet powerful Bash script** that streamlines your merge request workflow, saving you **time** and **effort** while keeping your focus on coding.
   
 
-## 📚 Why Use This Toolkit?
+### 🔥 Why You Need This
 
-###  **✅ Key Features:**
-
--  **One Command PRs:** Automate creating merge requests for multiple branches at once.
-
--  **Dynamic Project ID Retrieval:** No need to manually set the `PROJECT_ID`; the script fetches it automatically ( but sure it help if token in account level not project level ).
-
--  **Duplicate PR Prevention:** Checks for existing PRs before creating a new one.
-
--  **Custom Target Branches:** Specify branches manually or use default ones.
-
--  **Interactive Confirmation:** Get notified when using default branches.
-
--  **System-Wide Installation:** Easily install and run from anywhere.
-
--  **Error Handling & Logging:** Stay informed with detailed logs.
-
----
+✅ **One Command to Rule Them All** – No more manual MRs. Automate it with a single script.  
+✅ **Handles Multiple Branches** – Easily create MRs for multiple target branches without hassle. 
+✅ **Reduces Repetitive Tasks** – Automate filling in details with take your last commit as PR description.  
+✅ **Boosts Productivity** – Spend less time managing MRs and more time coding.
+✅ **Duplicate PR Prevention:** – Checks for existing PRs before creating a new one.
+✅ **System-Wide Installation:** – Easily install and run from anywhere.
+✅ **Error Handling & Logging:** – Stay informed with detailed logs.
+✅ **Custom Target Branches** – Specify branches manually for future use or set different target branches each time, even exporting your daily ones for flexible PR creation.
 
 ## 🛠️ How to Get Started
 
@@ -39,7 +33,7 @@ Run the following command to install and make it system-wide:
 
 ```bash
 
-sudo  curl  -sSLo  /usr/local/bin/gitlab_pr  https://raw.githubusercontent.com/theizekry/gitlab-merge-requests-bot/main/gitlab_pr.sh  &&  sudo  chmod  +x  /usr/local/bin/gitlab_pr
+sudo curl -sSLo /usr/local/bin/gitlab_pr https://raw.githubusercontent.com/theizekry/gitlab-merge-requests-bot/main/gitlab_pr.sh && sudo chmod  +x  /usr/local/bin/gitlab_pr
 
 ```
 
@@ -52,6 +46,8 @@ Set your token as `GITLAB_TOKEN` in your environment for authentication.
 
 **To authenticate with GitLab, you need either a **Personal Access Token** (linked to your user account for broad access across projects) or a **Project Access Token** (limited to specific project repositories for enhanced security).  
 For both, the required scopes are **API** and **write_repository**.  
+
+
 _Note:_ A project token only works with repos granted to it, whereas a personal token can access all projects on your GitLab account; set your token as `GITLAB_TOKEN` in your environment.**
 
 THEN
@@ -150,12 +146,13 @@ https://github.com/user-attachments/assets/c6cc8e88-6d73-4418-bc41-c3f9dc8b556d
 
 ## 💡 Future Enhancements
 
-- ✅ Support for GitLab **group-level MRs**
+- ✅ Support for GitHub and Bitbucket
 
 - ✅ Automatic **review assignments**
 
 - ✅ More **detailed logging & debugging** options
 
+- ✅ More Repositories with multiple Project access token type.
   
 
 ---
