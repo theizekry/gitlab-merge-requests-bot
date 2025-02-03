@@ -90,9 +90,11 @@ gitlab_pr
 
 
 
-https://github.com/user-attachments/assets/15367e38-ac2b-442a-aa5c-978767864bcc
 
 
+
+
+<video src="https://github.com/user-attachments/assets/15367e38-ac2b-442a-aa5c-978767864bcc" width="352" height="720"></video>
   
 
 ### ✅  **Specify Target Branches Manually**
