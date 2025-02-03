@@ -172,13 +172,23 @@ Give it a try today! Feel free to drop feedback or suggestions.
 🛠 Need help? Open an issue on [GitHub](https://github.com/theizekry/gitlab-merge-requests-bot/issues).
 
 
+
+
 <video url="./assets/demo.mp4"></video>
+
+
 
 
 ---
 
+
+
+
+
 <video src="./assets/demo.mp4" autoplay loop controls muted title="test-title">
  </video>
+
+
 
 
 
