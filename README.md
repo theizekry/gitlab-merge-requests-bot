@@ -122,16 +122,6 @@ cat  ~/gitlab_pr.log
 
 ```
 
-## 🎥 Demo in Action
-
-
-
-<video controls>
-  <source src="https://raw.githubusercontent.com/theizekry/gitlab-merge-requests-bot/main/assets/demo.mp4" type="video/mp4">
-</video>
-
-
-
 
 ---
   
