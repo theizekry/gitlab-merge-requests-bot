@@ -172,7 +172,7 @@ Give it a try today! Feel free to drop feedback or suggestions.
 🛠 Need help? Open an issue on [GitHub](https://github.com/theizekry/gitlab-merge-requests-bot/issues).
 
 
-<video url="https://github.com/user-attachments/assets/15367e38-ac2b-442a-aa5c-978767864bcc"></video>
+<video url="./assets/demo.mp4"></video>
 
 
 ---
