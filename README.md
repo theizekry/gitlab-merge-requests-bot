@@ -127,12 +127,10 @@ cat  ~/gitlab_pr.log
 
 Check out a quick demo of how this tool works:
 
-  
-  
 
-https://github.com/user-attachments/assets/bc0dafbe-17ad-40a8-ab52-ba7c9d846284
-
-
+<video controls>
+  <source src="[https://raw.githubusercontent.com/your-repo/main/video.mp](https://github.com/user-attachments/assets/bc0dafbe-17ad-40a8-ab52-ba7c9d846284)4" type="video/mp4">
+</video>
 
 ---
 
