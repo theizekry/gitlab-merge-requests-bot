@@ -128,10 +128,11 @@ cat  ~/gitlab_pr.log
 Check out a quick demo of how this tool works:
 
   
-
-https://github.com/user-attachments/assets/c6cc8e88-6d73-4418-bc41-c3f9dc8b556d
-
   
+
+https://github.com/user-attachments/assets/bc0dafbe-17ad-40a8-ab52-ba7c9d846284
+
+
 
 ---
 
