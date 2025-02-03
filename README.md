@@ -121,7 +121,6 @@ export  DEFAULT_TARGET_BRANCHES="branch1 branch2 branch3"
 cat  ~/gitlab_pr.log
 
 ```
----
 
 ## 🎥 Demo in Action
 
