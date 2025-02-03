@@ -125,8 +125,6 @@ cat  ~/gitlab_pr.log
 
 ## 🎥 Demo in Action
 
-Check out a quick demo of how this tool works:
-
 
 
 <video controls>
