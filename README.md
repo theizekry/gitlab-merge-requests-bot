@@ -130,8 +130,9 @@ Check out a quick demo of how this tool works:
 
 
 <video controls>
-  <source src="./assets/demo.mp4" type="video/mp4">
+  <source src="https://raw.githubusercontent.com/theizekry/gitlab-merge-requests-bot/main/assets/demo.mp4" type="video/mp4">
 </video>
+
 
 
 
