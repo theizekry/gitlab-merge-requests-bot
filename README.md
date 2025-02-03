@@ -175,8 +175,12 @@ Give it a try today! Feel free to drop feedback or suggestions.
 <video url="https://github.com/user-attachments/assets/15367e38-ac2b-442a-aa5c-978767864bcc"></video>
 
 
+---
 
-https://github.com/user-attachments/assets/15367e38-ac2b-442a-aa5c-978767864bcc
+<video src="https://github.com/user-attachments/assets/15367e38-ac2b-442a-aa5c-978767864bcc" autoplay loop controls muted title="test-title">
+ </video>
+
+
 
 
 Happy coding! 🌟
