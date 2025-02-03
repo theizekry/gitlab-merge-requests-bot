@@ -127,9 +127,13 @@ cat  ~/gitlab_pr.log
 
 Check out a quick demo of how this tool works:
 
+
+
 <video controls>
   <source src="./assets/demo.mp4" type="video/mp4">
 </video>
+
+
 
 ---
   
