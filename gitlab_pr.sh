@@ -109,29 +109,35 @@ GITLAB_URL="https://gitlab.com/api/v4"
 SOURCE_BRANCH=$(git branch --show-current)
 PULL_REQUEST_DESCRIPTION=$(git log -1 --pretty=%B)
 
-# Function to get the GitLab Project ID dynamically
+# Function to get the GitLab Project ID dynamic
 fetch_project_id() {
-  local repo_url
-  repo_url=$(git config --get remote.origin.url | sed 's/\.git$//')  # Get the repo URL
-  repo_url="${repo_url/git@github.com:/https://github.com/}"  # Convert SSH to HTTPS format
+  local repo_url repo_path response PROJECT_ID
+
+  # Get Git Remote URL and clean it
+  repo_url=$(git config --get remote.origin.url | sed 's/\.git$//')
   repo_url="${repo_url/git@gitlab.com:/https://gitlab.com/}"  # Convert SSH to HTTPS
 
-  echo "🔍 Fetching Project ID for repository: $repo_url"
+  # Extract GitLab group and project name (namespace/project_name)
+  repo_path=$(echo "$repo_url" | sed -E 's#https://gitlab.com/##')
 
-  local response
-  response=$(curl --silent --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$GITLAB_URL/projects?search=$(basename "$repo_url")")
+  echo "🔍 Fetching Project ID for repository: $repo_path"
 
-  PROJECT_ID=$(echo "$response" | grep -o '"id":[0-9]*' | head -1 | cut -d ':' -f2)
+  # Make API call to get the exact project details
+  response=$(curl --silent --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$GITLAB_URL/projects/${repo_path//\//%2F}")
+
+  #echo "GitLab API Response: $response"  # Debugging output
+
+  # Extract Project ID using grep and sed
+  PROJECT_ID=$(echo "$response" | grep -o '"id":[0-9]*' | sed 's/"id"://' |  sed -n '1p')
 
   if [[ -z "$PROJECT_ID" ]]; then
-    echo "❌ Error: Could not fetch PROJECT_ID from GitLab. Ensure the repository exists and your token has API access."
-    exit 1
+    error "Error: Could not fetch PROJECT_ID from GitLab. Ensure the repository exists and your token has API access."
   fi
 
   echo "✅ Project ID: $PROJECT_ID"
-  # Set PROJECT ID
-  GITLAB_PROJECT_ID=$PROJECT_ID
+  export GITLAB_PROJECT_ID=$PROJECT_ID
 }
+
 
 # Function to verify GitLab Token
 verify_gitlab_token() {
