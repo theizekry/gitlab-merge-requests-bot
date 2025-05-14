@@ -48,7 +48,7 @@ sudo curl -sSLo /usr/local/bin/gitlab_pr https://raw.githubusercontent.com/theiz
 
 To authenticate with GitLab, you need a either **Personal Access Token** or **Project Access Token**:
 
-A **Personal Access Token** is linked to your user account for broad access across projects for more info please visit https://shorturl.at/QEbyn., while a **Project Access Token** is limited to a specific project.  
+A **Personal Access Token** is linked to your user account for broad access across projects for more info please visit https://docs.gitlab.com/user/profile/personal_access_tokens/#create-a-personal-access-token, while a **Project Access Token** is limited to a specific project.  
 Set your token as `GITLAB_TOKEN` in your environment for authentication.  
 
 **To authenticate with GitLab, you need either a **Personal Access Token** (linked to your user account for broad access across projects) or a **Project Access Token** (limited to specific project repositories for enhanced security).  
