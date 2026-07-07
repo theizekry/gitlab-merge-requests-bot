@@ -3,8 +3,9 @@
 # Author: Islam Zekry
 # GitHub: https://github.com/theizekry
 # Description: This script automates the creation of Merge Requests on GitLab for one or more targets branches by simple one hit.
-# Version: 1.0
-# Release Date: 01-2025
+# Version: 2.0
+# Release Date: 07-2026
+# Release note: fetch project id By using flexible pattern matching (Regular Expressions) instead of hardcoded string matching,
 # ----------------------------------------------------------------
 
 
@@ -110,34 +111,38 @@ SOURCE_BRANCH=$(git branch --show-current)
 PULL_REQUEST_DESCRIPTION=$(git log -1 --pretty=%B)
 
 # Function to get the GitLab Project ID dynamic
+# Function to get the GitLab Project ID dynamically
 fetch_project_id() {
   local repo_url repo_path response PROJECT_ID
 
-  # Get Git Remote URL and clean it
-  repo_url=$(git config --get remote.origin.url | sed 's/\.git$//')
-  repo_url="${repo_url/git@gitlab.com:/https://gitlab.com/}"  # Convert SSH to HTTPS
+  # 1. Get raw Git Remote URL
+  repo_url=$(git config --get remote.origin.url)
 
-  # Extract GitLab group and project name (namespace/project_name)
-  repo_path=$(echo "$repo_url" | sed -E 's#https://gitlab.com/##')
+  # 2. Strip out standard SSH, HTTPS, and trailing ".git" cleanly
+  # This handles git@gitlab.com:, https://gitlab.com/, and ssh://git@gitlab.com/
+  repo_path=$(echo "$repo_url" | sed -E 's#(https://gitlab.com/|git@gitlab.[a-z0-9.-]+:)##' | sed 's/\.git$//' | xargs)
 
-  echo "🔍 Fetching Project ID for repository: $repo_path"
+  echo "🔍 Extracted Repository Path: $repo_path"
 
-  # Make API call to get the exact project details
-  response=$(curl --silent --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$GITLAB_URL/projects/${repo_path//\//%2F}")
+  # 3. Strictly URL-encode the slashes (convert / to %2F)
+  local encoded_path=$(echo "$repo_path" | sed 's#/#%2F#g')
 
-  #echo "GitLab API Response: $response"  # Debugging output
+  echo "🌐 Hitting Endpoint: $GITLAB_URL/projects/$encoded_path"
+
+  # 4. Make API call to get project details
+  response=$(curl --silent --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$GITLAB_URL/projects/$encoded_path")
 
   # Extract Project ID using grep and sed
-  PROJECT_ID=$(echo "$response" | grep -o '"id":[0-9]*' | sed 's/"id"://' |  sed -n '1p')
+  PROJECT_ID=$(echo "$response" | grep -o '"id":[0-9]*' | sed 's/"id"://' | sed -n '1p')
 
   if [[ -z "$PROJECT_ID" ]]; then
-    error "Error: Could not fetch PROJECT_ID from GitLab. Ensure the repository exists and your token has API access."
+    echo -e "${RED}GitLab API Debug Response: $response${NC}"
+    error "Error: Could not fetch PROJECT_ID from GitLab. Ensure the path above matches your GitLab repository web URL."
   fi
 
-  echo "✅ Project ID: $PROJECT_ID"
+  echo "✅ Project ID Found: $PROJECT_ID"
   export GITLAB_PROJECT_ID=$PROJECT_ID
 }
-
 
 # Function to verify GitLab Token
 verify_gitlab_token() {
