@@ -2,12 +2,11 @@
 # GitLab Merge Request Script
 # Author: Islam Zekry
 # GitHub: https://github.com/theizekry
-# Description: This script automates the creation of Merge Requests on GitLab for one or more targets branches by simple one hit.
+# Description: This script automates the creation of Merge Requests on GitLab for one or more target branches in one hit.
 # Version: 2.0
 # Release Date: 07-2026
-# Release note: fetch project id By using flexible pattern matching (Regular Expressions) instead of hardcoded string matching,
+# Release note: Added URL-encoding for branch slashes and safe JSON payload encoding for commit messages.
 # ----------------------------------------------------------------
-
 
 # Some Colors for outputs.
 GREEN='\033[0;32m'
@@ -49,7 +48,6 @@ else
   DEFAULT_TARGET_BRANCHES=("master" "develop" "uat")
 fi
 
-
 # Function to display help message
 show_help() {
   echo "Usage: $(basename "$0") [TARGET_BRANCHES...]"
@@ -69,13 +67,13 @@ show_help() {
   echo "  -h, --help         Show this help message and exit."
   echo
   echo "Examples:"
-  echo "  $(basename "$0")                 # Uses default target branches (test, uat, beta)"
+  echo "  $(basename "$0")                 # Uses default target branches (master, develop, uat)"
   echo "  $(basename "$0") develop master  # Creates PRs only for 'develop' and 'master'"
   echo
   echo "About:"
   echo "  Author: Islam Zekry"
   echo "  GitHub: https://github.com/theizekry"
-  echo "  Description: This script automates the creation of Merge Requests on GitLab for one or more targets branches by simple one hit."
+  echo "  Description: This script automates the creation of Merge Requests on GitLab for one or more target branches."
   echo "  Version: 2.0"
   echo "  Release Date: 07-2026"
   echo
@@ -118,12 +116,11 @@ fetch_project_id() {
   repo_url=$(git config --get remote.origin.url)
 
   # 2. Strip out standard SSH, HTTPS, and trailing ".git" cleanly
-  # This handles git@gitlab.com:, https://gitlab.com/, and ssh://git@gitlab.com/
   repo_path=$(echo "$repo_url" | sed -E 's#(https://gitlab.com/|git@gitlab.[a-z0-9.-]+:)##' | sed 's/\.git$//' | xargs)
 
   echo "🔍 Extracted Repository Path: $repo_path"
 
-  # 3. Strictly URL-encode the slashes (convert / to %2F)
+  # 3. URL-encode the slashes (convert / to %2F)
   local encoded_path=$(echo "$repo_path" | sed 's#/#%2F#g')
 
   echo "🌐 Hitting Endpoint: $GITLAB_URL/projects/$encoded_path"
@@ -195,7 +192,7 @@ if [[ ${#TARGET_BRANCHES[@]} -eq 0 ]]; then
   fi
 fi
 
-# Check if branch exists
+# Check if branch exists locally
 if [[ -z "$SOURCE_BRANCH" ]]; then
   echo -e "${RED} Error: You are not on a branch. Please checkout a branch first.${NC}"
   exit 1
@@ -218,8 +215,8 @@ check_branch_exists() {
     return 1  # Branch does not exist
   fi
 }
- 
-# Prevent creating an Merge Requests if the source branch is in the target branches
+
+# Prevent creating a Merge Request if the source branch is in the target branches
 for TARGET_BRANCH in "${TARGET_BRANCHES[@]}"; do
   if [[ "$SOURCE_BRANCH" == "$TARGET_BRANCH" ]]; then
     error "-> Error: Source branch '$SOURCE_BRANCH' is one of the target branches ('$TARGET_BRANCH'). You cannot create a Merge Request from '$SOURCE_BRANCH' to itself."
@@ -250,15 +247,13 @@ for TARGET_BRANCH in "${TARGET_BRANCHES[@]}"; do
     TARGET_BRANCH_UC="$(echo "$TARGET_BRANCH" | awk '{print toupper(substr($0,1,1)) tolower(substr($0,2))}')"
     PULL_REQUEST_TITLE="$TARGET_BRANCH_UC | Merge $SOURCE_BRANCH → $TARGET_BRANCH"
 
+    # Safely generate valid JSON payload using Python to handle all quotes and multiline commit messages
+    PAYLOAD=$(python3 -c 'import json, sys; print(json.dumps({"source_branch": sys.argv[1], "target_branch": sys.argv[2], "title": sys.argv[3], "description": sys.argv[4]}))' "$SOURCE_BRANCH" "$TARGET_BRANCH" "$PULL_REQUEST_TITLE" "$PULL_REQUEST_DESCRIPTION")
+
     response=$(curl --silent --show-error --request POST "$GITLAB_URL/projects/$GITLAB_PROJECT_ID/merge_requests" \
       --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
       --header "Content-Type: application/json" \
-      --data "{
-        \"source_branch\": \"$SOURCE_BRANCH\",
-        \"target_branch\": \"$TARGET_BRANCH\",
-        \"title\": \"$PULL_REQUEST_TITLE\",
-        \"description\": \"$PULL_REQUEST_DESCRIPTION\"
-      }")
+      --data "$PAYLOAD")
 
     # Handle response
     if echo "$response" | grep -q '"id":'; then
@@ -268,7 +263,7 @@ for TARGET_BRANCH in "${TARGET_BRANCHES[@]}"; do
     elif echo "$response" | grep -qo "already exists"; then
       warning "❗️ Merge Request already exists for $SOURCE_BRANCH → $TARGET_BRANCH. Skipped..."
     else
-      error "❗️ Failed to create Merge Request for $TARGET_BRANCH."
+      error "❗️ Failed to create Merge Request for $TARGET_BRANCH." false
     fi
 
   else
