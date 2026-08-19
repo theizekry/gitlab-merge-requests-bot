@@ -76,8 +76,8 @@ show_help() {
   echo "  Author: Islam Zekry"
   echo "  GitHub: https://github.com/theizekry"
   echo "  Description: This script automates the creation of Merge Requests on GitLab for one or more targets branches by simple one hit."
-  echo "  Version: 1.0.0"
-  echo "  Release Date: 01-2025"
+  echo "  Version: 2.0"
+  echo "  Release Date: 07-2026"
   echo
   exit 0
 }
@@ -89,7 +89,7 @@ fi
 
 # Check Current version
 if [[ "$1" == "-v" || "$1" == "--version" ]]; then
-  success "GitPR Version 1.0.0" true
+  success "GitPR Version 2.0" true
 fi
 
 # Check if the current directory is a Git repository
@@ -110,7 +110,6 @@ GITLAB_URL="https://gitlab.com/api/v4"
 SOURCE_BRANCH=$(git branch --show-current)
 PULL_REQUEST_DESCRIPTION=$(git log -1 --pretty=%B)
 
-# Function to get the GitLab Project ID dynamic
 # Function to get the GitLab Project ID dynamically
 fetch_project_id() {
   local repo_url repo_path response PROJECT_ID
@@ -202,11 +201,16 @@ if [[ -z "$SOURCE_BRANCH" ]]; then
   exit 1
 fi
 
-# Function to check if a branch exists in GitLab
+# Function to check if a branch exists in GitLab (handles slashes in branch names)
 check_branch_exists() {
   local branch=$1
+  local encoded_branch
+
+  # Replace slashes with %2F for URL compatibility
+  encoded_branch=$(echo "$branch" | sed 's#/#%2F#g')
+
   local response
-  response=$(curl --silent --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$GITLAB_URL/projects/$GITLAB_PROJECT_ID/repository/branches/$branch")
+  response=$(curl --silent --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$GITLAB_URL/projects/$GITLAB_PROJECT_ID/repository/branches/$encoded_branch")
 
   if echo "$response" | grep -q '"name":'; then
     return 0  # Branch exists
@@ -227,7 +231,7 @@ done
 check_existing_mr() {
   local target_branch=$1
   local response
-  response=$(curl --silent --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$GITLAB_URL/projects/$PROJECT_ID/merge_requests?state=opened")
+  response=$(curl --silent --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$GITLAB_URL/projects/$GITLAB_PROJECT_ID/merge_requests?state=opened")
 
   existing_mr_url=$(echo "$response" | grep -o "\"web_url\":\"[^\"]*\"" | grep "$target_branch" | cut -d '"' -f 4)
 
